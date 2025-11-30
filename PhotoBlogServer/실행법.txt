@@ -1,0 +1,5 @@
+cd PhotoBlogServer 
+
+.\venv\Scripts\activate
+
+python manage.py runserver

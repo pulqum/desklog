@@ -1,0 +1,48 @@
+{% extends 'blog/base.html' %}
+
+{% block content %}
+<div class="detail-container" style="max-width: 800px; margin: 0 auto; padding: 20px;">
+    <div class="post-detail-card" style="background: #fff; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+        <div class="detail-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 1px solid #eee; padding-bottom: 15px;">
+            <span class="detail-category" style="font-size: 1.5em; font-weight: bold;">
+                {% if post.category == 'PHONE' %}
+                    <span style="color: #d32f2f;">📱 딴짓 감지</span>
+                {% elif post.category == 'AWAY' %}
+                    <span style="color: #f57c00;">🏃 자리 비움</span>
+                {% else %}
+                    <span style="color: #388e3c;">📖 공부 중</span>
+                {% endif %}
+            </span>
+            <span class="detail-date" style="color: #888; font-size: 1.1em;">{{ post.published_date|date:"Y.m.d H:i:s" }}</span>
+        </div>
+
+        {% if post.image and post.image.name and post.image.name != 'intruder_image/default_error.png' %}
+        <div class="detail-image" style="text-align: center; margin-bottom: 25px;">
+            <img src="{{ post.image.url }}" alt="{{ post.title }}" style="max-width: 100%; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+        </div>
+        {% endif %}
+
+        <h2 style="margin-bottom: 20px; font-size: 1.8em;">{{ post.title }}</h2>
+        <div class="detail-text" style="font-size: 1.2em; line-height: 1.8; color: #333; background: #f9f9f9; padding: 20px; border-radius: 10px;">
+            {{ post.text|linebreaksbr }}
+        </div>
+
+        <div class="detail-actions" style="margin-top: 40px; display: flex; justify-content: flex-end; gap: 10px;">
+            {% if user.is_authenticated %}
+                {% if post.category == 'PHONE' or post.category == 'AWAY' %}
+                <form action="{% url 'post_correction' pk=post.pk %}" method="POST" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success btn-lg" onclick="return confirm('이 기록을 [공부 중]으로 정정하시겠습니까?');" style="background-color: #4caf50; border-color: #4caf50;">
+                        ✅ 잘못된 감지 신고 (공부 중으로 변경)
+                    </button>
+                </form>
+                {% endif %}
+                
+                <a class="btn btn-default btn-lg" href="{% url 'post_edit' pk=post.pk %}">
+                    <span class="glyphicon glyphicon-pencil"></span> 수정
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

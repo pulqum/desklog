@@ -1,0 +1,86 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+
+# Android
+*.apk
+*.ap_
+*.dex
+bin/
+gen/
+.gradle/
+local.properties
+proguard/
+*.log
+.navigation/
+captures/
+*.jks
+*.keystore
+
+# IDE
+.vscode/
+!YOLOv5/.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Test 폴더 제외
+test/
+
+# YOLOv5
+YOLOv5/runs/
+YOLOv5/weights/
+YOLOv5/*.pt
+YOLOv5/*.onnx
+YOLOv5/*.engine
+YOLOv5/*.mlmodel
+YOLOv5/*.tflite
+YOLOv5/wandb/
+YOLOv5/.git/
+YOLOv5/venv/
+YOLOv5/data/images/
+YOLOv5/data/videos/
+YOLOv5/data/*.cache
+YOLOv5/data/coco/
+YOLOv5/data/coco128/
+YOLOv5/*.zip
+YOLOv5/*.tar
+YOLOv5/*.tar.gz
+YOLOv5/.env

@@ -1,0 +1,337 @@
+.detail-container {
+	max-width: 900px;
+	margin: 0 auto;
+	padding-top: 120px;
+	padding-left: 20px;
+	padding-right: 20px;
+}
+/* 알약형 정렬 토글 바 */
+.pill-sort-bar {
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin: 110px auto 12px auto;
+	position: relative;
+	z-index: 900;
+}
+.pill-switch {
+	display: flex;
+	background: rgba(255,255,255,0.5);
+	border-radius: 32px;
+	box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+	backdrop-filter: blur(8px) saturate(120%);
+	-webkit-backdrop-filter: blur(8px) saturate(120%);
+	padding: 4px 8px;
+	gap: 2px;
+	position: relative;
+}
+.pill-thumb {
+	position: absolute;
+	top: 4px;
+	left: 8px;
+	height: calc(100% - 8px);
+	width: 0; /* JS로 동적으로 맞춤 */
+	border-radius: 24px;
+	background: rgba(255,255,255,0.6);
+	box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+	backdrop-filter: blur(8px) saturate(120%);
+	-webkit-backdrop-filter: blur(8px) saturate(120%);
+	transition: left 200ms ease, width 200ms ease;
+	z-index: 1;
+	pointer-events: none;
+}
+.pill-option {
+	min-width: 100px;
+	padding: 8px 24px;
+	border-radius: 24px;
+	font-size: 16px;
+	font-weight: 600;
+	color: #222;
+	background: transparent;
+	cursor: pointer;
+	transition: background 0.2s, color 0.2s;
+	text-align: center;
+	user-select: none;
+	position: relative;
+	z-index: 2;
+}
+.pill-option.pill-active { color: #222; }
+.header-flex {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 100%;
+	padding: 0 32px;
+}
+.header-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 44px;
+	height: 44px;
+	border-radius: 50%;
+	background-color: #F5F3E7;
+	color: #222;
+	border: 1px solid #e5e2d9;
+	box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+	text-decoration: none;
+}
+.header-icon:hover { filter: brightness(0.98); text-decoration: none; }
+.header-icon.edit { color: inherit; }
+.header-flex h1 {
+	margin: 0 auto;
+	flex-grow: 1;
+	text-align: center;
+}
+.header-flex .top-menu {
+	font-size: 26pt;
+	margin: 0;
+	padding-left: 0;
+	position: relative;
+	top: 0;
+}
+/* 헤더 제목은 Lobster 서체 유지 (색상은 아래 공통 규칙에서 관리) */
+.page-header h1 a { font-family: 'Lobster'; }
+
+/* 본문 폰트: Suit (눈누) */
+@font-face {
+	font-family: 'Suit';
+	src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Regular.woff2') format('woff2');
+	font-weight: normal;
+	font-display: swap;
+}
+
+/* 본문 제목 폰트: Paperozi (Paperlogy SemiBold) */
+@font-face {
+	font-family: 'Paperozi';
+	src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-6SemiBold.woff2') format('woff2');
+	font-weight: 600;
+	font-display: swap;
+}
+
+/* 공통 간격 변수 (유지보수 편의) */
+:root {
+	--gap-y: 12px; /* 요소 사이 세로 간격 */
+}
+
+body {
+	padding-left: 0;
+	font-family: 'Suit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+	/* 옅은 회색-베이지 그라데이션 배경 */
+	background: linear-gradient(135deg, #f5f3ef 0%, #ece9e6 50%, #f2f0ec 100%);
+	background-attachment: fixed; /* 스크롤 시 고정 느낌 */
+}
+
+
+/* 헤더: 상단 고정, 중앙정렬, 좌우 그라데이션(금색-흰색-하늘색-아이보리) */
+.page-header {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	z-index: 1000;
+	margin-top: 0;
+	padding: 24px 0 20px 0;
+	text-align: center;
+	background: linear-gradient(90deg, #e7cf46 0%, #FFFFFF 50%, #B2EBF2 100%);
+	box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+	border-bottom: 1px solid rgba(220,220,220,0.25);
+}
+/* 에디트 버튼(연필) 아이보리 배경 */
+.btn-default {
+	background-color: #F5F3E7 !important;
+	border-color: #e5e2d9 !important;
+	color: #222 !important;
+}
+.page-header h1,
+.page-header h1 a,
+.page-header h1 a:visited,
+.page-header h1 a:active {
+	color: #222;
+	font-size: 36pt;
+	text-decoration: none;
+	letter-spacing: 1px;
+	font-weight: 700;
+	text-shadow: 0 1px 0 #fff, 0 2px 8px rgba(255,215,0,0.12);
+}
+
+.content {
+	margin-left: 0; /* 중앙 정렬은 Bootstrap container에 맡김 */
+}
+
+.date { color: #828282; }
+.save { float: right; }
+.post-form textarea, .post-form input { width: 100%; }
+.post-form input, .post-form textarea, .post-form select {
+	/* 고정 헤더에 가려지지 않도록 포커스/스크롤 시 여유 공간 확보 */
+	scroll-margin-top: 120px;
+}
+.top-menu, .top-menu:hover, .top-menu:visited {
+	color: inherit;
+	text-decoration: none;
+}
+/* 헤더 우측 에디트 버튼은 고정 크기로 레이아웃 안정화 */
+.page-header .top-menu {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 44px;
+	height: 44px;
+	margin: 0; /* hover 시 흔들림 방지 */
+}
+
+/* 헤더 아이콘 내부 글리프 크기/정렬 보정 및 색상 */
+.header-icon .glyphicon { font-size: 20px; line-height: 1; }
+/* 플러스 아이콘은 GitHub 아이콘과 동일 스타일(검은색) 상속 */
+.header-icon.edit { color: inherit; }
+.header-icon.edit:hover { color: inherit; }
+
+/* 포스트 카드: 여백/경계/배경/블러를 한 곳에서 관리 */
+.post {
+	margin-bottom: 20px;
+	border: 1px solid rgba(233, 233, 233, 0.6);
+	border-radius: 12px;
+	padding: 16px;
+	background: rgba(255, 255, 255, 0.6);
+	backdrop-filter: saturate(120%) blur(10px);
+	-webkit-backdrop-filter: saturate(120%) blur(10px);
+	overflow: hidden;
+	box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+}
+
+.post h1 { color: #000000; font-weight: 600; margin-top: 0; font-family: 'Paperozi', 'Suit', -apple-system, 'Segoe UI', Roboto, Arial, sans-serif; }
+.post h1 a, .post h1 a:visited { color: #000000; font-weight: 600; font-family: 'Paperozi', 'Suit', -apple-system, 'Segoe UI', Roboto, Arial, sans-serif; }
+/* 제목 링크 밑줄 제거 및 hover시에도 유지 */
+.post h1 a,
+.post h1 a:visited,
+.post h1 a:hover,
+.post h1 a:focus {
+	text-decoration: none;
+}
+
+/* 날짜와 제목 사이 간격 (리스트/디테일 공통) */
+.post .date { margin-bottom: 8px; }
+
+/* 리스트/디테일 공통 이미지 규칙: 한 번만 정의 */
+.post-image, .intruder-image-list { /* intruder-image-list는 호환용 별칭 */
+	object-fit: cover;
+	display: block;
+	width: 100%;
+	height: auto;
+	max-width: 100%;
+	margin: var(--gap-y) 0;
+}
+
+/* 컨테이너 화면 전체 사용 (기존 동작 유지) */
+.content.container {
+	width: 100% !important;
+	padding-top: 20px;
+}
+
+/* 디테일 화면에서만 적용되는 본문 폭 제한 */
+.detail-container {
+	max-width: 1200px;
+	margin: 0 auto;
+}
+
+/* Masonry.js 기반 촘촘 레이아웃: 수평 순서를 최대한 유지 (horizontalOrder) */
+.masonry-grid {
+	margin: 0 auto;
+}
+.masonry-grid-sizer,
+.masonry-grid-item { width: 100%; }
+@media (min-width: 768px) {
+	.masonry-grid-sizer,
+	.masonry-grid-item { width: 50%; }
+}
+@media (min-width: 1200px) {
+	.masonry-grid-sizer,
+	.masonry-grid-item { width: 33.2%; }
+}
+.masonry-grid-item { padding: 0 8px 24px; box-sizing: border-box; }
+.masonry-grid-item.is-clickable { cursor: default; }
+.post.is-clickable { cursor: pointer; }
+
+/* 카드 이미지: 원본 비율 유지 */
+.post-image { object-fit: contain; height: auto; width: 100%; }
+
+.post-text {
+	display: -webkit-box;
+	line-clamp: 5;
+	-webkit-line-clamp: 5; /* 최대 5줄 표시 */
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
+/* 탐지 게시글 스타일 */
+.detection-post {
+	position: relative;
+	border-left: 4px solid #ccc;
+	transition: all 0.3s ease;
+}
+
+.detection-post.danger-level {
+	background: linear-gradient(135deg, rgba(255,59,48,0.08) 0%, rgba(255,59,48,0.02) 100%);
+	border-left-color: #ff3b30;
+}
+
+.detection-post.danger-level:hover {
+	background: linear-gradient(135deg, rgba(255,59,48,0.12) 0%, rgba(255,59,48,0.04) 100%);
+	box-shadow: 0 4px 20px rgba(255,59,48,0.2);
+}
+
+.detection-post.warning-level {
+	background: linear-gradient(135deg, rgba(255,149,0,0.08) 0%, rgba(255,149,0,0.02) 100%);
+	border-left-color: #ff9500;
+}
+
+.detection-post.warning-level:hover {
+	background: linear-gradient(135deg, rgba(255,149,0,0.12) 0%, rgba(255,149,0,0.04) 100%);
+	box-shadow: 0 4px 20px rgba(255,149,0,0.2);
+}
+
+.detection-post.info-level {
+	background: linear-gradient(135deg, rgba(0,122,255,0.06) 0%, rgba(0,122,255,0.01) 100%);
+	border-left-color: #007aff;
+}
+
+.detection-post.info-level:hover {
+	background: linear-gradient(135deg, rgba(0,122,255,0.10) 0%, rgba(0,122,255,0.03) 100%);
+	box-shadow: 0 4px 20px rgba(0,122,255,0.15);
+}
+
+/* 탐지 배지 */
+.detection-badge {
+	position: absolute;
+	top: 12px;
+	right: 12px;
+	z-index: 10;
+}
+
+.detection-badge span {
+	display: inline-block;
+	padding: 4px 12px;
+	border-radius: 12px;
+	font-size: 12px;
+	font-weight: 600;
+	letter-spacing: 0.5px;
+}
+
+.badge-danger {
+	background: rgba(255,59,48,0.9);
+	color: white;
+	box-shadow: 0 2px 8px rgba(255,59,48,0.3);
+}
+
+.badge-warning {
+	background: rgba(255,149,0,0.9);
+	color: white;
+	box-shadow: 0 2px 8px rgba(255,149,0,0.3);
+}
+
+.badge-info {
+	background: rgba(0,122,255,0.9);
+	color: white;
+	box-shadow: 0 2px 8px rgba(0,122,255,0.3);
+}

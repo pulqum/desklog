@@ -1,0 +1,76 @@
+<!-- Author : kiokahn -->
+{% extends 'blog/base.html' %}
+{% block sortbar %}
+<div class="pill-sort-bar">
+    <div class="pill-switch">
+        <div class="pill-thumb"></div>
+        <div class="pill-option pill-active" data-sort="desc">최신순</div>
+        <div class="pill-option" data-sort="asc">오래된순</div>
+    </div>
+</div>
+{% endblock %}
+{% block content %}
+    <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <div class="timeline-container">
+            {% for post in posts %}
+            <div class="timeline-item {% if post.category == 'PHONE' %}status-phone{% elif post.category == 'AWAY' %}status-away{% else %}status-study{% endif %}" data-href="{% url 'post_detail' pk=post.pk %}">
+                <div class="timeline-icon">
+                    {% if post.category == 'PHONE' %}📱{% elif post.category == 'AWAY' %}🏃{% else %}📖{% endif %}
+                </div>
+                <div class="timeline-content">
+                    <div class="timeline-header">
+                        <span class="timeline-time">{{ post.published_date|date:"H:i" }}</span>
+                        <span class="timeline-title">{{ post.title }}</span>
+                    </div>
+                    {% if post.image and post.image.name and post.image.name != 'intruder_image/default_error.png' %}
+                        <div class="timeline-image-wrapper">
+                            <img src="{{ post.image.url }}" class="timeline-image" alt="{{ post.title }}">
+                        </div>
+                    {% endif %}
+                    <p class="timeline-text">{{ post.text|truncatechars:50 }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <style>
+        .timeline-container {
+            padding: 20px 0;
+        }
+        .timeline-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.2s;
+            border: 1px solid #eee;
+        }
+        .timeline-item:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+        
+        .status-phone { background-color: #ffebee; border-left: 5px solid #ef5350; }
+        .status-away { background-color: #fff3e0; border-left: 5px solid #ff9800; }
+        .status-study { background-color: #e8f5e9; border-left: 5px solid #4caf50; }
+        
+        .timeline-icon { font-size: 24px; margin-right: 15px; min-width: 30px; text-align: center; }
+        .timeline-content { flex: 1; }
+        .timeline-header { margin-bottom: 8px; display: flex; align-items: center; }
+        .timeline-time { font-weight: bold; color: #555; margin-right: 10px; font-size: 1.1em; }
+        .timeline-title { font-size: 16px; font-weight: 600; }
+        .timeline-image-wrapper { margin-top: 10px; margin-bottom: 10px; }
+        .timeline-image { max-height: 150px; border-radius: 5px; object-fit: cover; }
+        .timeline-text { color: #666; font-size: 0.9em; margin: 0; }
+    </style>
+    
+    <script>
+        document.querySelectorAll('.timeline-item').forEach(item => {
+            item.addEventListener('click', () => {
+                window.location.href = item.dataset.href;
+            });
+        });
+    </script>
+{% endblock %}
