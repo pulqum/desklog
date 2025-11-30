@@ -2,7 +2,22 @@ from django.conf import settings
 from django.db import models
 from django.utils import timezone
 
+class StudySession(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    start_time = models.DateTimeField(default=timezone.now)
+    end_time = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.start_time.strftime('%Y-%m-%d %H:%M')} 세션"
+
+    def duration(self):
+        if self.end_time:
+            return self.end_time - self.start_time
+        return timezone.now() - self.start_time
+
 class Post(models.Model):
+    session = models.ForeignKey(StudySession, on_delete=models.CASCADE, related_name='posts', null=True, blank=True)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default=1)
     title = models.CharField(max_length=200)
     text = models.TextField()

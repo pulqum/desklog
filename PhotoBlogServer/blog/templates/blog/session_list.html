@@ -1,0 +1,147 @@
+{% extends 'blog/base.html' %}
+
+{% block content %}
+<div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+    
+    <!-- Active Session Card -->
+    {% if active_session %}
+    <div class="active-session-card">
+        <div class="status-indicator pulse"></div>
+        <h2>📖 공부 중입니다!</h2>
+        <p class="start-time">시작 시간: {{ active_session.start_time|date:"H:i" }}</p>
+        <div class="session-actions">
+            <a href="{% url 'post_image_new' %}" class="btn btn-success">📷 기록 추가</a>
+            <a href="{% url 'post_list' session_id=active_session.pk %}" class="btn btn-primary">기록 보기</a>
+            <a href="{% url 'session_end' %}" class="btn btn-danger" onclick="return confirm('공부를 종료하시겠습니까?');">공부 종료</a>
+        </div>
+    </div>
+    {% else %}
+    <div class="start-session-card">
+        <h2>새로운 공부를 시작하세요</h2>
+        <a href="{% url 'session_start' %}" class="btn btn-success btn-lg btn-block">🚀 공부 시작하기</a>
+    </div>
+    {% endif %}
+
+    <hr>
+
+    <!-- Past Sessions List -->
+    <h3>📚 지난 공부 기록</h3>
+    <div class="session-list">
+        {% if has_legacy_posts %}
+        <div class="session-item legacy-session" onclick="location.href='{% url 'post_list' session_id=0 %}'">
+            <div class="session-info">
+                <span class="session-date">📂 이전 기록 보관함</span>
+                <span class="session-time">세션 기능 도입 전 기록들</span>
+            </div>
+            <div class="session-arrow">›</div>
+        </div>
+        {% endif %}
+
+        {% for session in sessions %}
+        <div class="session-item-wrapper">
+            <div class="session-item" onclick="location.href='{% url 'post_list' session_id=session.pk %}'">
+                <div class="session-info">
+                    <span class="session-date">{{ session.start_time|date:"Y.m.d" }}</span>
+                    <span class="session-time">{{ session.start_time|date:"H:i" }} ~ {% if session.end_time %}{{ session.end_time|date:"H:i" }}{% else %}진행 중{% endif %}</span>
+                </div>
+                <div class="session-arrow">›</div>
+            </div>
+            <form action="{% url 'session_remove' session_id=session.pk %}" method="POST" class="session-delete-form" onsubmit="return confirm('이 세션과 포함된 모든 기록을 삭제하시겠습니까?');">
+                {% csrf_token %}
+                <button type="submit" class="btn-delete-session" title="세션 삭제">🗑️</button>
+            </form>
+        </div>
+        {% empty %}
+        {% if not has_legacy_posts %}
+        <p class="no-sessions">아직 기록된 공부 세션이 없습니다.</p>
+        {% endif %}
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .active-session-card {
+        background: #e8f5e9;
+        border: 2px solid #4caf50;
+        border-radius: 15px;
+        padding: 30px;
+        text-align: center;
+        margin-bottom: 30px;
+        position: relative;
+    }
+    .status-indicator {
+        width: 15px;
+        height: 15px;
+        background-color: #4caf50;
+        border-radius: 50%;
+        position: absolute;
+        top: 20px;
+        right: 20px;
+    }
+    .pulse {
+        animation: pulse-animation 2s infinite;
+    }
+    @keyframes pulse-animation {
+        0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4); }
+        70% { box-shadow: 0 0 0 10px rgba(76, 175, 80, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
+    }
+    .start-session-card {
+        background: #f5f5f5;
+        border-radius: 15px;
+        padding: 40px;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .session-item-wrapper {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+        gap: 10px;
+    }
+    .session-item {
+        background: #fff;
+        border: 1px solid #eee;
+        padding: 20px;
+        border-radius: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+        transition: background 0.2s;
+        flex-grow: 1;
+    }
+    .session-item:hover {
+        background: #f9f9f9;
+    }
+    .legacy-session {
+        background-color: #fff8e1;
+        border-color: #ffecb3;
+    }
+    .session-date {
+        font-weight: bold;
+        font-size: 1.1em;
+        margin-right: 15px;
+        color: #333;
+    }
+    .session-time {
+        color: #666;
+    }
+    .session-arrow {
+        font-size: 1.5em;
+        color: #ccc;
+    }
+    .btn-delete-session {
+        background: none;
+        border: none;
+        font-size: 1.2em;
+        cursor: pointer;
+        opacity: 0.5;
+        transition: opacity 0.2s;
+        padding: 10px;
+    }
+    .btn-delete-session:hover {
+        opacity: 1;
+    }
+</style>
+{% endblock %}

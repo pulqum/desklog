@@ -1,16 +1,28 @@
 <!-- Author : kiokahn -->
 {% extends 'blog/base.html' %}
-{% block sortbar %}
-<div class="pill-sort-bar">
-    <div class="pill-switch">
-        <div class="pill-thumb"></div>
-        <div class="pill-option pill-active" data-sort="desc">최신순</div>
-        <div class="pill-option" data-sort="asc">오래된순</div>
-    </div>
-</div>
-{% endblock %}
+
 {% block content %}
     <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        
+        <div class="session-header" style="margin-bottom: 30px; border-bottom: 1px solid #eee; padding-bottom: 20px;">
+            <h2>
+                <a href="{% url 'session_list' %}" style="text-decoration: none; color: #333;">←</a> 
+                {% if session %}
+                    {{ session.start_time|date:"Y.m.d" }} 공부 기록
+                {% else %}
+                    📂 이전 기록 보관함
+                {% endif %}
+            </h2>
+            {% if session %}
+            <p style="color: #666;">
+                {{ session.start_time|date:"H:i" }} ~ 
+                {% if session.end_time %}{{ session.end_time|date:"H:i" }}{% else %}진행 중{% endif %}
+            </p>
+            {% else %}
+            <p style="color: #666;">세션 기능 도입 전의 기록들입니다.</p>
+            {% endif %}
+        </div>
+
         <div class="timeline-container">
             {% for post in posts %}
             <div class="timeline-item {% if post.category == 'PHONE' %}status-phone{% elif post.category == 'AWAY' %}status-away{% else %}status-study{% endif %}" data-href="{% url 'post_detail' pk=post.pk %}">
@@ -29,6 +41,11 @@
                     {% endif %}
                     <p class="timeline-text">{{ post.text|truncatechars:50 }}</p>
                 </div>
+            </div>
+            {% empty %}
+            <div class="empty-timeline" style="text-align: center; padding: 50px; color: #999;">
+                <p>아직 기록된 내용이 없습니다.</p>
+                <p>공부를 시작하면 AI가 자동으로 기록합니다.</p>
             </div>
             {% endfor %}
         </div>
@@ -73,4 +90,35 @@
             });
         });
     </script>
+
+    {% if user.is_authenticated %}
+    <a href="{% url 'post_image_new' %}" class="fab-btn" title="새 글 작성">
+        📷
+    </a>
+    <style>
+        .fab-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background-color: #4caf50;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 60px;
+            font-size: 24px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transition: transform 0.2s, background-color 0.2s;
+            z-index: 1000;
+            text-decoration: none;
+        }
+        .fab-btn:hover {
+            background-color: #43a047;
+            transform: scale(1.1);
+            color: white;
+            text-decoration: none;
+        }
+    </style>
+    {% endif %}
 {% endblock %}

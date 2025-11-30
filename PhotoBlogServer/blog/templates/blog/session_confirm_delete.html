@@ -1,0 +1,25 @@
+{% extends 'blog/base.html' %}
+
+{% block content %}
+    <div class="col-md-6 col-md-offset-3">
+        <div class="panel panel-danger" style="margin-top: 50px;">
+            <div class="panel-heading">
+                <h3 class="panel-title">세션 삭제 확인</h3>
+            </div>
+            <div class="panel-body">
+                <p>정말로 다음 세션을 삭제하시겠습니까?</p>
+                <div class="well">
+                    <p><strong>시작 시간:</strong> {{ session.start_time }}</p>
+                    <p><strong>종료 시간:</strong> {{ session.end_time|default:"진행 중" }}</p>
+                </div>
+                <p class="text-danger">
+                    <strong>주의:</strong> 이 세션에 포함된 모든 포스트와 이미지가 함께 삭제됩니다.
+                </p>
+                <form method="post">{% csrf_token %}
+                    <button type="submit" class="btn btn-danger">삭제하기</button>
+                    <a href="{% url 'session_list' %}" class="btn btn-default">취소</a>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

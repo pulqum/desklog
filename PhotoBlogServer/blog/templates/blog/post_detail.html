@@ -41,6 +41,9 @@
                 <a class="btn btn-default btn-lg" href="{% url 'post_edit' pk=post.pk %}">
                     <span class="glyphicon glyphicon-pencil"></span> 수정
                 </a>
+                <a class="btn btn-default btn-lg" href="{% url 'post_remove' pk=post.pk %}" onclick="return confirm('정말 삭제하시겠습니까?');">
+                    <span class="glyphicon glyphicon-remove"></span> 삭제
+                </a>
             {% endif %}
         </div>
     </div>
