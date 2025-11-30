@@ -30,16 +30,19 @@ class YoloDetector:
                 self.model = torch.hub.load(YOLO_DIR, 'custom', path=MODEL_PATH, source='local')
                 # Set confidence threshold
                 self.model.conf = 0.4 
+                self.load_error = None
             except Exception as e:
                 print(f"Error loading model: {e}")
                 self.model = None
+                self.load_error = str(e)
 
     def detect(self, image_path):
         if self.model is None:
             self.load_model()
         
         if self.model is None:
-            return 'STUDY', 'AI 로딩 실패 (기본값)'
+            error_msg = getattr(self, 'load_error', 'Unknown Error')
+            return 'STUDY', f'AI 로딩 실패: {error_msg}'
 
         try:
             results = self.model(image_path)
