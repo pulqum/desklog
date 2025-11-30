@@ -5,20 +5,54 @@
     
     <!-- Active Session Card -->
     {% if active_session %}
-    <div class="active-session-card">
+    <div class="session-card-common active-session-card">
         <div class="status-indicator pulse"></div>
-        <h2>📖 공부 중입니다!</h2>
-        <p class="start-time">시작 시간: {{ active_session.start_time|date:"H:i" }}</p>
+        <h2 class="card-title">📖 공부 중입니다!</h2>
+        <div id="study-timer" class="study-timer">00:00:00</div>
+        <p class="start-time-text">시작 시간: {{ active_session.start_time|date:"H:i" }}</p>
         <div class="session-actions">
-            <a href="{% url 'post_image_new' %}" class="btn btn-success">📷 기록 추가</a>
-            <a href="{% url 'post_list' session_id=active_session.pk %}" class="btn btn-primary">기록 보기</a>
-            <a href="{% url 'session_end' %}" class="btn btn-danger" onclick="return confirm('공부를 종료하시겠습니까?');">공부 종료</a>
+            <a href="{% url 'post_image_new' %}" class="btn btn-success btn-action">기록 추가</a>
+            <a href="{% url 'post_list' session_id=active_session.pk %}" class="btn btn-primary btn-action">기록 보기</a>
+            <a href="{% url 'session_end' %}" class="btn btn-danger btn-action" onclick="return confirm('공부를 종료하시겠습니까?');">종료</a>
         </div>
+        <script>
+            (function() {
+                const startTimeStr = "{{ active_session.start_time|date:'c' }}";
+                const timerElement = document.getElementById('study-timer');
+                
+                function updateTimer() {
+                    const now = new Date().getTime();
+                    const startTime = new Date(startTimeStr).getTime();
+                    const diff = now - startTime;
+                    
+                    if (diff < 0) return; // Future time protection
+
+                    const hours = Math.floor(diff / (1000 * 60 * 60));
+                    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                    
+                    let timeString = "";
+                    if (hours > 0) {
+                        timeString += String(hours).padStart(2, '0') + ":";
+                    }
+                    timeString += String(minutes).padStart(2, '0') + ":";
+                    timeString += String(seconds).padStart(2, '0');
+                    
+                    timerElement.textContent = timeString;
+                }
+                
+                setInterval(updateTimer, 1000);
+                updateTimer();
+            })();
+        </script>
     </div>
     {% else %}
-    <div class="start-session-card">
-        <h2>새로운 공부를 시작하세요</h2>
-        <a href="{% url 'session_start' %}" class="btn btn-success btn-lg btn-block">🚀 공부 시작하기</a>
+    <div class="session-card-common start-session-card">
+        <h2 class="card-title">새로운 공부를 시작하세요</h2>
+        <p class="card-subtitle">오늘도 목표를 향해 달려볼까요?</p>
+        <a href="{% url 'session_start' %}" class="btn-start-study">
+            <span class="icon">🚀</span> 공부 시작하기
+        </a>
     </div>
     {% endif %}
 
@@ -60,38 +94,128 @@
 </div>
 
 <style>
-    .active-session-card {
-        background: #e8f5e9;
-        border: 2px solid #4caf50;
-        border-radius: 15px;
-        padding: 30px;
+    /* Common Card Style for Consistency */
+    .session-card-common {
+        min-height: 320px; /* Fixed height to prevent layout shift */
+        border-radius: 24px;
+        padding: 40px;
         text-align: center;
-        margin-bottom: 30px;
+        margin-bottom: 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.08);
         position: relative;
+        transition: transform 0.3s ease;
+        background: #fff;
     }
+
+    /* Active Session Specifics */
+    .active-session-card {
+        border: 2px solid #4caf50;
+        background: linear-gradient(to bottom, #ffffff, #f1f8e9);
+    }
+    
+    .study-timer {
+        font-size: 4em;
+        font-weight: 800;
+        color: #2e7d32;
+        font-family: 'Courier New', Courier, monospace; /* Monospace for stable numbers */
+        margin: 10px 0;
+        text-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+    }
+
+    .start-time-text {
+        color: #666;
+        margin-bottom: 20px;
+        font-size: 1.1em;
+    }
+
+    .session-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        width: 100%;
+    }
+
+    .btn-action {
+        padding: 10px 20px;
+        border-radius: 12px;
+        font-weight: 600;
+    }
+
+    /* Start Session Specifics */
+    .start-session-card {
+        border: 1px solid #eee;
+        background: linear-gradient(to bottom, #ffffff, #fafafa);
+    }
+
+    .card-title {
+        font-size: 2em;
+        font-weight: 700;
+        margin-bottom: 10px;
+        color: #333;
+    }
+
+    .card-subtitle {
+        color: #888;
+        margin-bottom: 30px;
+        font-size: 1.2em;
+    }
+
+    /* Stylish Start Button */
+    .btn-start-study {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #4caf50 0%, #43a047 100%);
+        color: white;
+        padding: 18px 50px;
+        font-size: 1.5em;
+        font-weight: bold;
+        border-radius: 50px;
+        text-decoration: none;
+        box-shadow: 0 10px 25px rgba(76, 175, 80, 0.4);
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Bouncy effect */
+        border: 2px solid transparent;
+    }
+
+    .btn-start-study:hover {
+        transform: translateY(-5px) scale(1.02);
+        box-shadow: 0 15px 35px rgba(76, 175, 80, 0.5);
+        color: white;
+        text-decoration: none;
+        background: linear-gradient(135deg, #66bb6a 0%, #4caf50 100%);
+    }
+
+    .btn-start-study:active {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+    }
+
+    .btn-start-study .icon {
+        margin-right: 12px;
+        font-size: 1.2em;
+    }
+
+    /* Pulse Indicator */
     .status-indicator {
-        width: 15px;
-        height: 15px;
+        width: 18px;
+        height: 18px;
         background-color: #4caf50;
         border-radius: 50%;
         position: absolute;
-        top: 20px;
-        right: 20px;
+        top: 25px;
+        right: 25px;
     }
     .pulse {
         animation: pulse-animation 2s infinite;
     }
     @keyframes pulse-animation {
         0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4); }
-        70% { box-shadow: 0 0 0 10px rgba(76, 175, 80, 0); }
+        70% { box-shadow: 0 0 0 15px rgba(76, 175, 80, 0); }
         100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
-    }
-    .start-session-card {
-        background: #f5f5f5;
-        border-radius: 15px;
-        padding: 40px;
-        text-align: center;
-        margin-bottom: 30px;
     }
     .session-item-wrapper {
         display: flex;

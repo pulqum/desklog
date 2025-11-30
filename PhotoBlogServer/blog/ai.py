@@ -52,11 +52,11 @@ class YoloDetector:
             print(f"Detected labels: {labels}")
 
             if 'cell phone' in labels:
-                return 'PHONE', '🚨 딴짓 감지! (휴대폰)'
+                return 'PHONE', '딴짓 감지!'
             elif 'person' in labels:
-                return 'STUDY', '📖 열공 중 (사람 감지)'
+                return 'STUDY', '열공 중'
             else:
-                return 'AWAY', '🏃 자리 비움 (사람 없음)'
+                return 'AWAY', '자리 비움'
         except Exception as e:
             print(f"Detection Error: {e}")
             return 'STUDY', 'AI 분석 오류'
