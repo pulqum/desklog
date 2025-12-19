@@ -5,6 +5,7 @@ from rest_framework import routers
 
 router = routers.DefaultRouter()
 router.register('Post', views.IntruderImage)
+router.register('Session', views.StudySessionViewSet, basename='session')
 
 urlpatterns = [
     path('', views.session_list, name='session_list'),

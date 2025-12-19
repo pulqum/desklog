@@ -9,7 +9,7 @@ from .serializers import PostSerializer
 from .ai import detector  # Import AI detector
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
-from django.http import JsonResponse, FileResponse, HttpResponseNotFound
+from django.http import JsonResponse, FileResponse, HttpResponseNotFound, HttpResponse
 from django.conf import settings
 import os
 
@@ -32,7 +32,12 @@ def session_start(request):
     # Close any existing active sessions
     StudySession.objects.filter(user=request.user, is_active=True).update(is_active=False, end_time=timezone.now())
     # Start new session
-    StudySession.objects.create(user=request.user)
+    session = StudySession.objects.create(user=request.user)
+    
+    # API 요청인 경우 JSON 반환
+    if request.headers.get('Content-Type') == 'application/json' or 'application/json' in request.headers.get('Accept', ''):
+        return JsonResponse({'success': True, 'session_id': session.id})
+    
     return redirect('session_list')
 
 @login_required
@@ -260,8 +265,27 @@ def demo_video_file(request):
         return HttpResponseNotFound(f"Error serving demo video: {e}")
 
 class IntruderImage(viewsets.ModelViewSet):
+    from rest_framework.permissions import IsAuthenticated
     queryset = Post.objects.all()
     serializer_class = PostSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        # 로그인한 사용자의 게시물만 반환
+        return Post.objects.filter(author=self.request.user)
+
+class StudySessionViewSet(viewsets.ModelViewSet):
+    from .serializers import StudySessionSerializer
+    from rest_framework.permissions import IsAuthenticated
+    from .models import StudySession
+    
+    queryset = StudySession.objects.all()  # router가 basename을 결정하기 위해 필요
+    serializer_class = StudySessionSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        # 로그인한 사용자의 세션만 반환
+        return StudySession.objects.filter(user=self.request.user).order_by('-start_time')
 
 
 @login_required

@@ -138,10 +138,11 @@ public class MainActivity extends AppCompatActivity {
                         String title = post_json.optString("title", "제목 없음");
                         String text = post_json.optString("text", "");
                         String publishedDate = post_json.optString("published_date", "");
+                        String category = post_json.optString("category", "STUDY");
 
                         // 이미지 다운로드
                         Bitmap imageBitmap = null;
-                        imageUrl = post_json.getString("image");
+                        imageUrl = post_json.optString("image", "");
                         // default_error.png는 무시
                         if (!imageUrl.equals("")
                                 && !imageUrl.equals("null")
@@ -165,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
                         }
 
                         // Post 객체 생성 및 리스트에 추가
-                        Post post = new Post(postId, title, text, publishedDate, imageBitmap);
+                        Post post = new Post(postId, title, text, publishedDate, category, imageBitmap, imageUrl);
                         postList.add(post);
                     }
                     return aryJson;
@@ -211,7 +212,9 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected Boolean doInBackground(String... params) {
-            if (bitmap == null) {
+            // null 체크 강화
+            if (bitmap == null || bitmap.isRecycled()) {
+                android.util.Log.e("MainActivity", "Bitmap is null or recycled");
                 return false;
             }
             try {
@@ -230,8 +233,18 @@ public class MainActivity extends AppCompatActivity {
                 String publishedDate = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", java.util.Locale.getDefault()).format(new java.util.Date());
 
                 // 이미지 데이터 준비 (생성자로 받은 bitmap 사용)
+                // 추가 null 체크
+                if (bitmap == null || bitmap.isRecycled()) {
+                    android.util.Log.e("MainActivity", "Bitmap became null or recycled during processing");
+                    return false;
+                }
+                
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                boolean compressResult = bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                if (!compressResult) {
+                    android.util.Log.e("MainActivity", "Failed to compress bitmap");
+                    return false;
+                }
                 byte[] imageBytes = baos.toByteArray();
 
                 // multipart 데이터 작성
@@ -254,6 +267,11 @@ public class MainActivity extends AppCompatActivity {
                 postData.append("Content-Type: image/jpeg\r\n\r\n");
 
                 // 바이트 데이터 추가
+                if (imageBytes == null || imageBytes.length == 0) {
+                    android.util.Log.e("MainActivity", "Image bytes are null or empty");
+                    return false;
+                }
+                
                 conn.getOutputStream().write(postData.toString().getBytes());
                 conn.getOutputStream().write(imageBytes);
                 conn.getOutputStream().write("\r\n".getBytes());
@@ -264,10 +282,12 @@ public class MainActivity extends AppCompatActivity {
                 if (responseCode == HttpURLConnection.HTTP_CREATED) {
                     return true;
                 } else {
+                    android.util.Log.e("MainActivity", "Upload failed with response code: " + responseCode);
                     return false;
                 }
 
-            } catch (IOException e) {
+            } catch (Exception e) {
+                android.util.Log.e("MainActivity", "Error in PutPost: " + e.getMessage(), e);
                 return false;
             }
         }
@@ -277,6 +297,11 @@ public class MainActivity extends AppCompatActivity {
             if (success) {
                 // 업로드 성공 시 다운로드 자동 호출
                 onClickDownload(null);
+            } else {
+                // 업로드 실패 시 사용자에게 알림
+                runOnUiThread(() -> {
+                    Toast.makeText(MainActivity.this, "업로드 실패: 이미지가 없거나 잘못되었습니다", Toast.LENGTH_LONG).show();
+                });
             }
         }
     }
