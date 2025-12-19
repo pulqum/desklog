@@ -21,5 +21,6 @@ urlpatterns = [
     path('post/<int:pk>/remove/', views.post_remove, name='post_remove'),
     path('js_test/', views.js_test, name='js_test'),
     path('demo_ai/', views.demo_ai, name='demo_ai'),
+    path('demo_video.mp4', views.demo_video_file, name='demo_video_file'),
     path('api_root/', include(router.urls)),
 ]

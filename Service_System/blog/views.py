@@ -9,7 +9,9 @@ from .serializers import PostSerializer
 from .ai import detector  # Import AI detector
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
-from django.http import JsonResponse
+from django.http import JsonResponse, FileResponse, HttpResponseNotFound
+from django.conf import settings
+import os
 
 @login_required
 def session_list(request):
@@ -182,6 +184,22 @@ def demo_ai(request):
         "category": cat,
         "title": title,
     })
+
+
+def demo_video_file(request):
+    """
+    test/demo_video.mp4 파일을 브라우저로 스트리밍하는 뷰.
+    웹캠이 없을 때 브라우저에서 이 비디오를 재생해 프론트엔드에서 프레임을 캡처하도록 사용.
+    """
+    demo_path = os.path.abspath(os.path.join(settings.BASE_DIR, '../test/demo_video.mp4'))
+    if not os.path.exists(demo_path):
+        return HttpResponseNotFound(f"Demo video file not found at: {demo_path}")
+
+    try:
+        file = open(demo_path, 'rb')
+        return FileResponse(file, content_type='video/mp4')
+    except Exception as e:
+        return HttpResponseNotFound(f"Error serving demo video: {e}")
 
 class IntruderImage(viewsets.ModelViewSet):
     queryset = Post.objects.all()
