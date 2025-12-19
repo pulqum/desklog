@@ -1,0 +1,4 @@
+서비스 URL :  http://khuminsoo.pythonanywhere.com
+또는 https://desklog.pulqum.com
+
+소스코드 git 주소 : https://github.com/pulqum/desklog
