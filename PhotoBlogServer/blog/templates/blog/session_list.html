@@ -11,9 +11,34 @@
         <div id="study-timer" class="study-timer">00:00:00</div>
         <p class="start-time-text">시작 시간: {{ active_session.start_time|date:"H:i" }}</p>
         <div class="session-actions">
-            <a href="{% url 'post_image_new' %}" class="btn btn-success btn-action">기록 추가</a>
+            <a href="{% url 'post_image_new' %}" class="btn btn-success btn-action">수동 기록 추가</a>
             <a href="{% url 'post_list' session_id=active_session.pk %}" class="btn btn-primary btn-action">기록 보기</a>
             <a href="{% url 'session_end' %}" class="btn btn-danger btn-action" onclick="return confirm('공부를 종료하시겠습니까?');">종료</a>
+        </div>
+
+        <!-- Webcam Monitoring Panel -->
+        <div class="webcam-panel">
+            <h4 class="webcam-title">실시간 집중 상태 모니터링</h4>
+            <p class="webcam-subtitle">카메라를 켜두면 상태가 바뀔 때만 자동으로 기록합니다.</p>
+            <div class="webcam-layout">
+                <div class="webcam-preview-wrap">
+                    <video id="desklog-webcam" class="webcam-video" autoplay playsinline muted></video>
+                </div>
+                <div class="webcam-status-wrap">
+                    <button id="desklog-webcam-toggle" class="btn btn-default btn-sm webcam-toggle-btn">
+                        웹캠 감지 시작
+                    </button>
+                    <p id="desklog-webcam-status" class="webcam-status-text">
+                        웹캠이 꺼져 있습니다.
+                    </p>
+                    <p id="desklog-webcam-last" class="webcam-last-change">
+                        마지막 상태: 없음
+                    </p>
+                </div>
+            </div>
+            <small class="webcam-notice text-muted">
+                * 브라우저 카메라 권한이 필요합니다. 영상은 서버로 주기적으로 캡처되어 YOLOv5로 분석됩니다.
+            </small>
         </div>
         <script>
             (function() {
@@ -44,6 +69,13 @@
                 setInterval(updateTimer, 1000);
                 updateTimer();
             })();
+
+            // Setup webcam monitoring after DOM is ready
+            document.addEventListener('DOMContentLoaded', function () {
+                if (typeof setupWebcamMonitoring === 'function') {
+                    setupWebcamMonitoring({{ active_session.pk }});
+                }
+            });
         </script>
     </div>
     {% else %}

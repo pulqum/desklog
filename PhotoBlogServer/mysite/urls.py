@@ -24,6 +24,8 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 urlpatterns = [
     path("admin/", admin.site.urls),
     path('api-token-auth/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    # Django built-in auth URLs: /accounts/login/, /accounts/logout/, etc.
+    path('accounts/', include('django.contrib.auth.urls')),
     path('', include('blog.urls')),
 ]
 

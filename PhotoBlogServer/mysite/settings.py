@@ -133,3 +133,8 @@ REST_FRAMEWORK = {
     ],
     'PAGE_SIZE': 10
 }
+
+# Authentication redirects
+LOGIN_URL = "login"
+LOGIN_REDIRECT_URL = "session_list"
+LOGOUT_REDIRECT_URL = "login"

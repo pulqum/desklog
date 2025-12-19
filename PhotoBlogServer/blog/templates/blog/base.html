@@ -17,10 +17,20 @@
                 </svg>
             </a>
             <h1><a href="/">DeskLog</a></h1>
-            {% if user.is_authenticated %}
-                <!-- Global New Post button removed. It will be placed in the session timeline. -->
-                <div style="width: 44px;"></div> <!-- Spacer to balance the header -->
-            {% endif %}
+            <div class="pull-right" style="display: flex; align-items: center; gap: 10px;">
+                {% if user.is_authenticated %}
+                    <span class="text-muted" style="font-size: 13px;">
+                        {{ user.username }} 님
+                    </span>
+                    <a href="{% url 'logout' %}" class="btn btn-default btn-sm">
+                        로그아웃
+                    </a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="btn btn-primary btn-sm">
+                        로그인
+                    </a>
+                {% endif %}
+            </div>
         </div>
     </div>
     {% block sortbar %}{% endblock %}
