@@ -1,5 +1,6 @@
 package com.example.photoviewer;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -111,10 +112,32 @@ public class SessionDetailActivity extends AppCompatActivity {
                         Post post = new Post(postId, title, text, publishedDate, category, imageBitmap, imageUrl);
                         postList.add(post);
                     }
+                    // 시간순으로 정렬 (오래된 것부터)
+                    java.util.Collections.sort(postList, (p1, p2) -> {
+                        try {
+                            java.text.SimpleDateFormat format = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", java.util.Locale.getDefault());
+                            java.util.Date date1 = format.parse(p1.getPublishedDate());
+                            java.util.Date date2 = format.parse(p2.getPublishedDate());
+                            return date1.compareTo(date2);
+                        } catch (Exception e) {
+                            return 0;
+                        }
+                    });
                 }
                 return true;
             } catch (Exception e) {
                 e.printStackTrace();
+                android.util.Log.e("SessionDetailActivity", "Error loading session detail: " + e.getMessage());
+                // 401 Unauthorized 또는 403 Forbidden인 경우 토큰 만료로 간주
+                if (e.getMessage() != null && (e.getMessage().contains("401") || e.getMessage().contains("403") || e.getMessage().contains("Token expired"))) {
+                    // 토큰 만료 - UI 스레드에서 로그인 화면으로 이동
+                    runOnUiThread(() -> {
+                        ApiClient.clearToken(SessionDetailActivity.this);
+                        Toast.makeText(SessionDetailActivity.this, "로그인이 만료되었습니다. 다시 로그인해주세요.", Toast.LENGTH_LONG).show();
+                        startActivity(new Intent(SessionDetailActivity.this, LoginActivity.class));
+                        finish();
+                    });
+                }
                 return false;
             }
         }
@@ -123,11 +146,17 @@ public class SessionDetailActivity extends AppCompatActivity {
         protected void onPostExecute(Boolean success) {
             progressBar.setVisibility(View.GONE);
 
-            if (success && stats != null) {
+            if (success) {
                 // 통계 표시
-                tvFocusScore.setText(String.format("%.1f점", stats.getFocusScore()));
-                tvStats.setText(String.format("집중 %d회 | 딴짓 %d회 | 자리비움 %d회",
-                        stats.getTotalStudy(), stats.getTotalPhone(), stats.getTotalAway()));
+                if (stats != null) {
+                    tvFocusScore.setText(String.format("%.1f점", stats.getFocusScore()));
+                    tvStats.setText(String.format("집중 %d회 | 딴짓 %d회 | 자리비움 %d회",
+                            stats.getTotalStudy(), stats.getTotalPhone(), stats.getTotalAway()));
+                } else {
+                    // 통계가 없으면 기본값 표시
+                    tvFocusScore.setText("0.0점");
+                    tvStats.setText("집중 0회 | 딴짓 0회 | 자리비움 0회");
+                }
                 
                 adapter.notifyDataSetChanged();
             } else {

@@ -203,8 +203,28 @@ public class ApiClient {
             }
             reader.close();
             return new JSONObject(response.toString());
+        } else if (responseCode == HttpURLConnection.HTTP_UNAUTHORIZED || responseCode == 403) {
+            // 토큰 만료 - SharedPreferences에서 토큰 제거
+            clearToken(context);
+            throw new Exception("Authentication failed: " + responseCode + " (Token expired)");
         } else {
-            throw new Exception("Failed to get session: " + responseCode);
+            // 에러 응답 읽기
+            String errorMessage = "Failed to get session: " + responseCode;
+            try {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
+                StringBuilder error = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    error.append(line);
+                }
+                reader.close();
+                if (error.length() > 0) {
+                    errorMessage += " - " + error.toString();
+                }
+            } catch (Exception e) {
+                // 에러 스트림 읽기 실패는 무시
+            }
+            throw new Exception(errorMessage);
         }
     }
 

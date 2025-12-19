@@ -61,12 +61,12 @@ def session_remove(request, session_id):
 @login_required
 def post_list(request, session_id):
     if session_id == 0: # Special ID for legacy posts
-        posts = Post.objects.filter(session__isnull=True).order_by('-published_date')
+        posts = Post.objects.filter(session__isnull=True).order_by('published_date')  # 시간순 (오래된 것부터)
         session = {'start_time': timezone.now(), 'is_legacy': True} # Mock session object
         stats = None
     else:
         session = get_object_or_404(StudySession, pk=session_id)
-        posts = session.posts.all().order_by('-published_date')
+        posts = session.posts.all().order_by('published_date')  # 시간순 (오래된 것부터)
         
         # 통계 계산 (세션이 종료되지 않았거나 통계가 없으면 실시간 계산)
         if session.is_active or (session.total_study == 0 and session.total_phone == 0 and session.total_away == 0):

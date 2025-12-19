@@ -145,6 +145,18 @@ public class SessionListActivity extends AppCompatActivity {
                 return sessions;
             } catch (Exception e) {
                 e.printStackTrace();
+                android.util.Log.e("SessionListActivity", "Error loading sessions: " + e.getMessage());
+                // 401 Unauthorized 또는 403 Forbidden인 경우 토큰 만료로 간주
+                if (e.getMessage() != null && (e.getMessage().contains("401") || e.getMessage().contains("403") || e.getMessage().contains("Token expired"))) {
+                    // 토큰 만료 - UI 스레드에서 로그인 화면으로 이동
+                    runOnUiThread(() -> {
+                        ApiClient.clearToken(SessionListActivity.this);
+                        Toast.makeText(SessionListActivity.this, "로그인이 만료되었습니다. 다시 로그인해주세요.", Toast.LENGTH_LONG).show();
+                        startActivity(new Intent(SessionListActivity.this, LoginActivity.class));
+                        finish();
+                    });
+                    return new ArrayList<>();
+                }
                 return null;
             }
         }
@@ -154,19 +166,23 @@ public class SessionListActivity extends AppCompatActivity {
             progressBar.setVisibility(View.GONE);
             swipeRefreshLayout.setRefreshing(false);
 
-            if (sessions != null) {
-                sessionList.clear();
-                sessionList.addAll(sessions);
-                adapter.notifyDataSetChanged();
-                
-                if (sessionList.isEmpty()) {
-                    tvEmpty.setVisibility(View.VISIBLE);
-                    tvEmpty.setText("아직 기록된 공부 세션이 없습니다.");
-                } else {
-                    tvEmpty.setVisibility(View.GONE);
-                }
-            } else {
+            if (sessions == null) {
                 Toast.makeText(SessionListActivity.this, "세션을 불러올 수 없습니다", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // 토큰 만료 체크 (빈 리스트가 반환되고 에러 메시지에 401/403이 포함된 경우)
+            // 실제로는 API 호출 시 에러가 발생하면 null을 반환하므로 여기서는 일반 처리
+            
+            sessionList.clear();
+            sessionList.addAll(sessions);
+            adapter.notifyDataSetChanged();
+            
+            if (sessionList.isEmpty()) {
+                tvEmpty.setVisibility(View.VISIBLE);
+                tvEmpty.setText("아직 기록된 공부 세션이 없습니다.");
+            } else {
+                tvEmpty.setVisibility(View.GONE);
             }
         }
     }
