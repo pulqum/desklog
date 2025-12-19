@@ -8,6 +8,8 @@ router.register('Post', views.IntruderImage)
 
 urlpatterns = [
     path('', views.session_list, name='session_list'),
+    path('signup/', views.signup, name='signup'),
+    path('logout/', views.logout_view, name='logout'),
     path('session/start/', views.session_start, name='session_start'),
     path('session/end/', views.session_end, name='session_end'),
     path('session/<int:session_id>/remove/', views.session_remove, name='session_remove'),

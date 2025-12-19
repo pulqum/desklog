@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.utils import timezone
 from .models import Post, StudySession
 from django.shortcuts import render, get_object_or_404
-from .forms import PostForm, ImageUploadForm
+from .forms import PostForm, ImageUploadForm, SignUpForm
 from django.shortcuts import redirect
 from rest_framework import viewsets
 from .serializers import PostSerializer
@@ -210,6 +210,28 @@ def post_remove(request, pk):
 
 def js_test(request):
     return render(request, 'blog/js_test.html', {})
+
+def signup(request):
+    """회원가입 뷰"""
+    if request.method == 'POST':
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            user.email = form.cleaned_data.get('email')
+            user.save()
+            # 회원가입 후 자동 로그인
+            from django.contrib.auth import login
+            login(request, user)
+            return redirect('session_list')
+    else:
+        form = SignUpForm()
+    return render(request, 'registration/signup.html', {'form': form})
+
+def logout_view(request):
+    """로그아웃 뷰 (GET 요청도 허용)"""
+    from django.contrib.auth import logout
+    logout(request)
+    return redirect('login')
 
 def demo_ai(request):
     """
