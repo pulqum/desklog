@@ -28,8 +28,8 @@ class YoloDetector:
             try:
                 # Load model from local source
                 self.model = torch.hub.load(YOLO_DIR, 'custom', path=MODEL_PATH, source='local')
-                # Set confidence threshold
-                self.model.conf = 0.4 
+                # Set confidence threshold (낮을수록 더 민감하게 탐지)
+                self.model.conf = 0.25  # 0.4 → 0.25로 낮춰서 핸드폰/사람 탐지 민감도 향상 
                 self.load_error = None
             except Exception as e:
                 print(f"Error loading model: {e}")
