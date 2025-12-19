@@ -25,7 +25,7 @@ SECRET_KEY = "django-insecure-&2nyojrw2g^pj3bwy+h!riwg1am!z^52=(-8%!rnt=b-tp)-=j
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', '10.0.2.2','.pythonanywhere.com','khuminsoo.pythonanywhere.com']
+ALLOWED_HOSTS = ['127.0.0.1', '10.0.2.2','.pythonanywhere.com','khuminsoo.pythonanywhere.com', 'localhost', '*']  # 프로덕션에서는 '*' 제거하고 실제 도메인/IP 지정
 
 
 # Application definition
@@ -118,6 +118,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"  # collectstatic으로 수집된 파일 저장 위치
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

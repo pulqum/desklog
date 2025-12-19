@@ -10,8 +10,12 @@ pathlib.PosixPath = pathlib.WindowsPath
 
 # Define paths
 BASE_DIR = settings.BASE_DIR
-# Assuming Edge_System (YOLOv5) is in the parent directory of the Django project
-YOLO_DIR = os.path.abspath(os.path.join(BASE_DIR, '../Edge_System'))
+# Docker 환경에서는 /app/edge_system으로 마운트됨
+# 로컬 환경에서는 ../Edge_System 사용
+if os.path.exists('/app/edge_system'):
+    YOLO_DIR = '/app/edge_system'  # Docker 환경
+else:
+    YOLO_DIR = os.path.abspath(os.path.join(BASE_DIR, '../Edge_System'))  # 로컬 환경
 MODEL_PATH = os.path.join(YOLO_DIR, 'yolov5s.pt')
 
 class YoloDetector:

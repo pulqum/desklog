@@ -254,7 +254,11 @@ def demo_video_file(request):
     test/demo_video.mp4 파일을 브라우저로 스트리밍하는 뷰.
     웹캠이 없을 때 브라우저에서 이 비디오를 재생해 프론트엔드에서 프레임을 캡처하도록 사용.
     """
-    demo_path = os.path.abspath(os.path.join(settings.BASE_DIR, '../test/demo_video.mp4'))
+    # Docker 환경에서는 /app/test로 마운트됨
+    if os.path.exists('/app/test/demo_video.mp4'):
+        demo_path = '/app/test/demo_video.mp4'  # Docker 환경
+    else:
+        demo_path = os.path.abspath(os.path.join(settings.BASE_DIR, '../test/demo_video.mp4'))  # 로컬 환경
     if not os.path.exists(demo_path):
         return HttpResponseNotFound(f"Demo video file not found at: {demo_path}")
 
