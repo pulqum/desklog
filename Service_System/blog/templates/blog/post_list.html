@@ -23,6 +23,47 @@
             {% endif %}
         </div>
 
+        {% if stats and not session.is_legacy %}
+        <!-- 통계 섹션 -->
+        <div class="stats-section" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 20px; padding: 30px; margin-bottom: 30px; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+                <!-- 집중 점수 -->
+                <div style="flex: 1; min-width: 200px;">
+                    <h3 style="margin: 0 0 10px 0; font-size: 14px; opacity: 0.9; font-weight: 500;">오늘의 집중 점수</h3>
+                    <div style="font-size: 48px; font-weight: 800; line-height: 1;">
+                        {{ stats.focus_score }}<span style="font-size: 24px; opacity: 0.8;">점</span>
+                    </div>
+                    {% if stats.focus_score >= 80 %}
+                        <p style="margin: 10px 0 0 0; font-size: 14px; opacity: 0.9;">🌟 훌륭해요!</p>
+                    {% elif stats.focus_score >= 60 %}
+                        <p style="margin: 10px 0 0 0; font-size: 14px; opacity: 0.9;">👍 잘하고 있어요!</p>
+                    {% else %}
+                        <p style="margin: 10px 0 0 0; font-size: 14px; opacity: 0.9;">💪 더 집중해봐요!</p>
+                    {% endif %}
+                </div>
+                
+                <!-- 원그래프 -->
+                <div style="flex: 1; min-width: 250px; display: flex; flex-direction: column; align-items: center;">
+                    <canvas id="statsChart" style="max-width: 200px; max-height: 200px;"></canvas>
+                    <div style="margin-top: 15px; display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;">
+                        <div style="display: flex; align-items: center; gap: 5px;">
+                            <span style="display: inline-block; width: 12px; height: 12px; background: #4caf50; border-radius: 50%;"></span>
+                            <span style="font-size: 14px;">집중 {{ stats.total_study }}회</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 5px;">
+                            <span style="display: inline-block; width: 12px; height: 12px; background: #ef5350; border-radius: 50%;"></span>
+                            <span style="font-size: 14px;">딴짓 {{ stats.total_phone }}회</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 5px;">
+                            <span style="display: inline-block; width: 12px; height: 12px; background: #ff9800; border-radius: 50%;"></span>
+                            <span style="font-size: 14px;">자리비움 {{ stats.total_away }}회</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
         <div class="timeline-container">
             {% for post in posts %}
             <div class="timeline-item {% if post.category == 'PHONE' %}status-phone{% elif post.category == 'AWAY' %}status-away{% else %}status-study{% endif %}" data-href="{% url 'post_detail' pk=post.pk %}">
@@ -89,7 +130,89 @@
                 window.location.href = item.dataset.href;
             });
         });
+
+        {% if stats and not session.is_legacy %}
+        // Chart.js를 사용한 원그래프
+        const ctx = document.getElementById('statsChart');
+        if (ctx) {
+            // Chart.js CDN 로드 확인 후 차트 생성
+            if (typeof Chart !== 'undefined') {
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['집중', '딴짓', '자리비움'],
+                        datasets: [{
+                            data: [{{ stats.total_study }}, {{ stats.total_phone }}, {{ stats.total_away }}],
+                            backgroundColor: ['#4caf50', '#ef5350', '#ff9800'],
+                            borderWidth: 0,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const label = context.label || '';
+                                        const value = context.parsed || 0;
+                                        const total = {{ stats.total_count }};
+                                        const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                        return label + ': ' + value + '회 (' + percentage + '%)';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            } else {
+                // Chart.js가 로드되지 않았으면 동적으로 로드
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
+                script.onload = function() {
+                    new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['집중', '딴짓', '자리비움'],
+                            datasets: [{
+                                data: [{{ stats.total_study }}, {{ stats.total_phone }}, {{ stats.total_away }}],
+                                backgroundColor: ['#4caf50', '#ef5350', '#ff9800'],
+                                borderWidth: 0,
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            const label = context.label || '';
+                                            const value = context.parsed || 0;
+                                            const total = {{ stats.total_count }};
+                                            const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                            return label + ': ' + value + '회 (' + percentage + '%)';
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                };
+                document.head.appendChild(script);
+            }
+        }
+        {% endif %}
     </script>
+    
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
     {% if user.is_authenticated %}
     <a href="{% url 'post_image_new' %}" class="fab-btn" title="새 글 작성">

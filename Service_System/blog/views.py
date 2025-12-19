@@ -37,7 +37,12 @@ def session_start(request):
 
 @login_required
 def session_end(request):
-    StudySession.objects.filter(user=request.user, is_active=True).update(is_active=False, end_time=timezone.now())
+    active_sessions = StudySession.objects.filter(user=request.user, is_active=True)
+    for session in active_sessions:
+        session.is_active = False
+        session.end_time = timezone.now()
+        session.calculate_statistics()  # 통계 계산 및 저장
+        session.save()
     return redirect('session_list')
 
 @login_required
@@ -53,11 +58,42 @@ def post_list(request, session_id):
     if session_id == 0: # Special ID for legacy posts
         posts = Post.objects.filter(session__isnull=True).order_by('-published_date')
         session = {'start_time': timezone.now(), 'is_legacy': True} # Mock session object
+        stats = None
     else:
         session = get_object_or_404(StudySession, pk=session_id)
         posts = session.posts.all().order_by('-published_date')
+        
+        # 통계 계산 (세션이 종료되지 않았거나 통계가 없으면 실시간 계산)
+        if session.is_active or (session.total_study == 0 and session.total_phone == 0 and session.total_away == 0):
+            total_count = posts.count()
+            if total_count > 0:
+                total_study = posts.filter(category='STUDY').count()
+                total_phone = posts.filter(category='PHONE').count()
+                total_away = posts.filter(category='AWAY').count()
+                focus_score = round((total_study / total_count) * 100, 1)
+            else:
+                total_study = total_phone = total_away = 0
+                focus_score = 0.0
+        else:
+            # 이미 저장된 통계 사용
+            total_study = session.total_study
+            total_phone = session.total_phone
+            total_away = session.total_away
+            focus_score = session.focus_score
+        
+        stats = {
+            'total_study': total_study,
+            'total_phone': total_phone,
+            'total_away': total_away,
+            'focus_score': focus_score,
+            'total_count': total_study + total_phone + total_away,
+        }
     
-    return render(request, 'blog/post_list.html', {'posts': posts, 'session': session})
+    return render(request, 'blog/post_list.html', {
+        'posts': posts, 
+        'session': session,
+        'stats': stats
+    })
 
 @login_required
 def post_detail(request, pk):
