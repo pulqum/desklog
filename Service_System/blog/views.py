@@ -319,8 +319,13 @@ def session_capture(request, session_id):
     post.save()
 
     # Run AI detection
+    import time
+    detection_start = time.time()
     try:
         cat, title_suffix = detector.detect(post.image.path)
+        detection_time = time.time() - detection_start
+        print(f"AI detection took {detection_time:.2f} seconds")
+        
         post.category = cat
         post.title = title_suffix
         if cat == "PHONE":

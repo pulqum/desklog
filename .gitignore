@@ -63,6 +63,7 @@ Thumbs.db
 
 # Test 폴더 제외
 test/
+imsi/
 
 # Edge_System (YOLOv5)
 Edge_System/runs/
