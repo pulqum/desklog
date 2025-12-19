@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "PhotoViewer"
+rootProject.name = "Client_System"
 include(":app")
  

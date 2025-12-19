@@ -20,5 +20,6 @@ urlpatterns = [
     path('post/<int:pk>/correction/', views.post_correction, name='post_correction'),
     path('post/<int:pk>/remove/', views.post_remove, name='post_remove'),
     path('js_test/', views.js_test, name='js_test'),
+    path('demo_ai/', views.demo_ai, name='demo_ai'),
     path('api_root/', include(router.urls)),
 ]

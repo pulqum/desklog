@@ -9,8 +9,8 @@ pathlib.PosixPath = pathlib.WindowsPath
 
 # Define paths
 BASE_DIR = settings.BASE_DIR
-# Assuming YOLOv5 is in the parent directory of PhotoBlogServer
-YOLO_DIR = os.path.abspath(os.path.join(BASE_DIR, '../YOLOv5'))
+# Assuming Edge_System (YOLOv5) is in the parent directory of the Django project
+YOLO_DIR = os.path.abspath(os.path.join(BASE_DIR, '../Edge_System'))
 MODEL_PATH = os.path.join(YOLO_DIR, 'yolov5s.pt')
 
 class YoloDetector:
@@ -60,6 +60,13 @@ class YoloDetector:
         except Exception as e:
             print(f"Detection Error: {e}")
             return 'STUDY', 'AI 분석 오류'
+
+    def detect_demo_video(self):
+        """
+        테스트용: 웹캠이 없는 환경에서 test/demo_video.mp4 파일로 AI 동작 확인.
+        """
+        demo_path = os.path.abspath(os.path.join(BASE_DIR, '../test/demo_video.mp4'))
+        return self.detect(demo_path)
 
 # Create a singleton instance
 detector = YoloDetector()

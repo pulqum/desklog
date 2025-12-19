@@ -173,6 +173,16 @@ def post_remove(request, pk):
 def js_test(request):
     return render(request, 'blog/js_test.html', {})
 
+def demo_ai(request):
+    """
+    웹캠 없이 test/demo_video.mp4 파일로 AI 동작을 확인하는 단순 테스트용 뷰.
+    """
+    cat, title = detector.detect_demo_video()
+    return JsonResponse({
+        "category": cat,
+        "title": title,
+    })
+
 class IntruderImage(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
