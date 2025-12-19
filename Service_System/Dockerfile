@@ -5,7 +5,6 @@ WORKDIR /app
 
 # 시스템 패키지 설치 (YOLOv5에 필요)
 RUN apt-get update && apt-get install -y \
-    libgl1-mesa-glx \
     libglib2.0-0 \
     git \
     && rm -rf /var/lib/apt/lists/*
